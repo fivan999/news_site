@@ -15,7 +15,9 @@
 
 <div class="container mt-3">
     <div class="row">
-        <h1>{{ category.title }}</h1>
+        {% block sidebar_title %}
+            <h1>Новости</h1>
+        {% endblock %}
         <div class="col-md-3 mb-3">
         {% block sidebar %}
             {% include 'inc/_sidebar.html' %}
@@ -24,23 +26,7 @@
 
         <div class="col-md-9">
         {% block content %}
-                {% for item in news %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="media">
-                            <div class="media-body mb-2">
-                                <h5 class="card-title">{{ item.title }}</h5>
-                                <p class="card-text">{{ item.content }}</p>
-                                <p class="card-text"><small class="text-muted">Last updated {{ item.updated_at|date:"Y.m.d H:i" }}</small></p>
-                                <a href="{% url 'home' %}" class="btn btn-primary">Go somewhere</a>
-                            </div>
-                            {% if item.image %}
-                            <img src={{ item.image.url }} class="card-img-bottom mb-3" alt="..." style="max-width: 30%">
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+            CONTENT
         {% endblock %}
         </div>
 

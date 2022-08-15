@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+
+    {{ news_item.title }}
+
+{% endblock %}
+
+{% block sidebar_title %}
+
+    <h1>{{ news_item.title }}</h1>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="media">
+                <div class="media-body mb-2">
+                    <h5 class="card-title">{{ news_item.title }}</h5>
+                    <p class="card-text">{{ news_item.content }}</p>
+                    <p class="card-text"><small class="text-muted">Last updated {{ news_item.updated_at|date:"Y.m.d H:i" }}</small></p>
+                </div>
+                {% if news_item.image %}
+                <img src={{ news_item.image.url }} class="card-img-bottom mb-3" alt="..." style="max-width: 30%">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
