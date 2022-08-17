@@ -10,7 +10,7 @@
 
 {% block content %}
     <h1 class="mb-4">Добавление новости</h1>
-    <form action="{% url 'add_news' %}" method="post">
+    <form action="{% url 'add_news' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.non_field.errors }}
         {{ form.as_p }}
@@ -20,35 +20,29 @@
             <label for="{{ form.title.id_for_label }}">Название: </label>
             {{ form.title }}
             <div class="invalid-feedback">
-                {{ from.title.errors }}
+                Пожалуйста, введите название
             </div>
         </div>
 
         <div class="form-group mb-4">
             <label for="{{ form.content.id_for_label }}">Контент: </label>
             {{ form.content }}
-            <div class="invalid-feedback">
-                {{ from.content.errors }}
-            </div>
         </div>
 
         <div class="form-group mb-1">
             <label for="{{ form.is_published.id_for_label }}">Опубликовано: </label>
             {{ form.is_published }}
-            <div class="invalid-feedback">
-                {{ from.is_published.errors }}
-            </div>
         </div>
 
         <div class="form-group mb-4">
             <label for="{{ form.category.id_for_label }}"></label>
             {{ form.category }}
             <div class="invalid-feedback">
-                {{ from.category.errors }}
+                Пожалуйста, выберите категорию
             </div>
         </div>
-
         {% endcomment %}
+
 
         {% comment %}
             {% for field in form %}

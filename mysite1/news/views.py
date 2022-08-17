@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from news.models import News, Category
 from django.shortcuts import get_object_or_404, redirect
 from news.forms import NewsForm
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 
@@ -36,9 +37,9 @@ def view_news(request, news_id):
 
 def add_news(request):
     if request.method == 'POST':
-        form = NewsForm(request.POST)
+        form = NewsForm(request.POST, request.FILES)
         if form.is_valid():
-            just_news = News.objects.create(**form.cleaned_data)
+            just_news = form.save()
             return redirect(just_news)
     else:
         form = NewsForm()

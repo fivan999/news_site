@@ -1,10 +1,28 @@
 from django import forms
 from .models import *
+import re
+from django.core.exceptions import ValidationError
 
 
-class NewsForm(forms.Form):
-    title = forms.CharField(max_length=150, label='Название новости', widget=forms.TextInput(attrs={'class': 'form-control mb-4'}))
-    content = forms.CharField(label='Контент новости', required=False, widget=forms.Textarea(attrs={'class': 'form-control mb-4', 'rows': 5}))
-    is_published = forms.BooleanField(label='Опубликовать', required=False, initial=True,
-                                      widget=forms.CheckboxInput(attrs={'class': 'form-check-input mb-1'}))
-    category = forms.ModelChoiceField(queryset=Category.objects.all(), label='Категория', empty_label='Выберите категорию', widget=forms.Select(attrs={'class': 'form-select md-4'}))
+class NewsForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(NewsForm, self).__init__(*args, **kwargs)
+        self.fields['category'].empty_label = 'Выберите категорию'
+
+    class Meta:
+        model = News
+        # fields = '__all__'
+        fields = ['title', 'content', 'is_published', 'image', 'category']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control mb-4'}),
+            'content': forms.Textarea(attrs={'class': 'form-control mb-4', 'rows': 5}),
+            'is_published': forms.CheckboxInput(attrs={'class': 'form-check-input mb-1'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select md-4'})
+        }
+
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        if re.match(r'\d', title):
+            raise ValidationError('Название не должно начинаться с цифры')
+        return title
