@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from news.models import News, Category
 from django.shortcuts import get_object_or_404, redirect
 from news.forms import NewsForm
-from django.views.generic import ListView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView
 
 # Create your views here.
 
@@ -56,20 +57,32 @@ class NewsByCategory(ListView):
 #     return render(request, 'news/category.html', context)
 
 
-def view_news(request, news_id):
-    news_item = get_object_or_404(News, pk=news_id)
-    context = {
-        'news_item': news_item
-    }
-    return render(request, 'news/view_news.html', context)
+class ViewNews(DetailView):
+    model = News
+    template_name = 'news/view_news.html'
+    context_object_name = 'news_item'
 
 
-def add_news(request):
-    if request.method == 'POST':
-        form = NewsForm(request.POST, request.FILES)
-        if form.is_valid():
-            just_news = form.save()
-            return redirect(just_news)
-    else:
-        form = NewsForm()
-    return render(request, 'news/add_news.html', {'form': form})
+# def view_news(request, news_id):
+#     news_item = get_object_or_404(News, pk=news_id)
+#     context = {
+#         'news_item': news_item
+#     }
+#     return render(request, 'news/view_news.html', context)
+
+
+class CreateNews(CreateView):
+    template_name = 'news/add_news.html'
+    form_class = NewsForm
+    success_url = reverse_lazy('home')
+
+
+# def add_news(request):
+#     if request.method == 'POST':
+#         form = NewsForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             just_news = form.save()
+#             return redirect(just_news)
+#     else:
+#         form = NewsForm()
+#     return render(request, 'news/add_news.html', {'form': form})
