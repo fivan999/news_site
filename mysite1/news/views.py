@@ -14,7 +14,7 @@ class HomeNews(ListView):
     template_name = 'news/index.html'
     context_object_name = 'news'
     extra_context = {'title': 'Главная страница'}
-    allow_empty = False
+    allow_empty = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -74,7 +74,7 @@ class ViewNews(DetailView):
 class CreateNews(CreateView):
     template_name = 'news/add_news.html'
     form_class = NewsForm
-    success_url = reverse_lazy('home')
+    # success_url = reverse_lazy('home')
 
 
 # def add_news(request):
