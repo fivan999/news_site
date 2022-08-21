@@ -12,7 +12,7 @@ class News(models.Model):
     image = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True, verbose_name='Фото')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     category = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name='Категория',
-                                 related_name='get_news')
+                                 related_name='news')
     views = models.IntegerField(default=0, verbose_name='Просмотры')
 
     def __str__(self):

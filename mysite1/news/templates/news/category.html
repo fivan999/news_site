@@ -20,10 +20,10 @@
                     <div class="media-body mb-2">
                         <h5 class="card-title">{{ item.title }}</h5>
                         <p class="card-text">{{ item.content }}</p>
-                        <p class="card-text"><small class="text-muted">Last updated {{ item.updated_at|date:"Y.m.d H:i" }}</small></p>
                         {% if item.image %}
                             <img src={{ item.image.url }} class="card-img-bottom mb-3" alt="..." style="max-width: 30%"><br>
                         {% endif %}
+                        <p class="card-text"><small class="text-muted">Last updated {{ item.updated_at|date:"Y.m.d H:i" }}</small></p>
                         <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more</a>
                     </div>
 
