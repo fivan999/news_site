@@ -3,19 +3,22 @@
 {% block content %}
     {% for item in news %}
         <div class="card mb-3">
+            <div class="card-header">
+                Категория: <a href="{{ item.get_absolute_url}}" class="text-decoration-none">{{ item.category.title }}</a>
+            </div>
             <div class="card-body">
                 <div class="media">
                     <div class="media-body mb-2">
                         <h5 class="card-title">{{ item.title }}</h5>
                         <p class="card-text">{{ item.content }}</p>
                         {% if item.image %}
-                            <img src={{ item.image.url }} class="card-img-bottom mb-3" alt="..." style="max-width: 30%"><br>
+                            <img src={{ item.image.url }} class="card-img-bottom" alt="..." style="max-width: 30%"><br>
                         {% endif %}
-                        <p class="card-text"><small class="text-muted">Last updated {{ item.updated_at|date:"Y.m.d H:i"}}</small></p>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more</a>
                     </div>
-
                 </div>
+            </div>
+            <div class="card-footer">
+                <p class="card-text"><span class="text-muted">{{ item.updated_at|date:"Y.m.d H:i"}}</span></p>
             </div>
         </div>
     {% endfor %}

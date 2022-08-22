@@ -2,31 +2,36 @@
 
 {% block title %}
 
-    {{ news_item.title }}
+    {{ item.title }}
 
 {% endblock %}
 
 {% block sidebar_title %}
 
-    <h1>{{ news_item.title }}</h1>
+    <h1>{{ item.title }}</h1>
 
 {% endblock %}
 
 {% block content %}
 
     <div class="card mb-3">
-        <div class="card-body">
-            <div class="media">
-                <div class="media-body mb-2">
-                    <h5 class="card-title">{{ news_item.title }}</h5>
-                    <p class="card-text">{{ news_item.content }}</p>
-                    {% if news_item.image %}
-                        <img src={{ news_item.image.url }} class="card-img-bottom mb-3" alt="..." style="max-width: 30%">
-                    {% endif %}
-                    <p class="card-text"><small class="text-muted">Last updated {{ news_item.updated_at|date:"Y.m.d H:i" }}</small></p>
+            <div class="card-header">
+                Категория: <a href="{{ item.get_absolute_url}}" class="text-decoration-none">{{ item.category.title }}</a>
+            </div>
+            <div class="card-body">
+                <div class="media">
+                    <div class="media-body mb-2">
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <p class="card-text">{{ item.content }}</p>
+                        {% if item.image %}
+                            <img src={{ item.image.url }} class="card-img-bottom" alt="..." style="max-width: 30%"><br>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            <div class="card-footer">
+                <p class="card-text"><span class="text-muted">{{ item.updated_at|date:"Y.m.d H:i"}}</span></p>
+            </div>
         </div>
-    </div>
 
 {% endblock %}
