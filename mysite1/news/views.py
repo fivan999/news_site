@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from news.forms import NewsForm
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -15,15 +16,11 @@ class HomeNews(ListView):
     template_name = 'news/index.html'
     context_object_name = 'news'
     extra_context = {'title': 'Главная страница'}
-    allow_empty = True
+    allow_empty = False
+    paginate_by = 2
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['news'] = News.objects.exclude(is_published=0).select_related('category')
-        return context
-
-    # def get_queryset(self):
-    #     return News.objects.exclude(is_published=True)
+    def get_queryset(self):
+        return News.objects.exclude(is_published=0).select_related('category')
 
 
 # def index(request):
@@ -36,16 +33,19 @@ class HomeNews(ListView):
 
 
 class NewsByCategory(ListView):
+    paginate_by = 2
     model = News
     template_name = 'news/category.html'
     context_object_name = 'news'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['news'] = News.objects.filter(category_id=self.kwargs['category_id'],
-                                              is_published=1).select_related('category')
         context['category'] = Category.objects.get(pk=self.kwargs['category_id'])
         return context
+
+    def get_queryset(self):
+        return News.objects.filter(category_id=self.kwargs['category_id'],
+                                   is_published=1).select_related('category')
 
 
 # def get_category(request, category_id):
