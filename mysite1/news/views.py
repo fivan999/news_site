@@ -4,11 +4,29 @@ from news.models import News, Category
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from news.forms import NewsForm
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.core.paginator import Paginator
 
-# Create your views here.
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Регистрация успешна')
+            return redirect('login')
+        else:
+            messages.error(request, 'Ошибка регистрации')
+    else:
+        form = UserCreationForm()
+    return render(request, 'news/register.html', {'form': form})
+
+
+def login(request):
+    return render(request, 'news/login.html')
 
 
 class HomeNews(ListView):
@@ -77,7 +95,6 @@ class CreateNews(LoginRequiredMixin, CreateView):
     form_class = NewsForm
     login_url = '/admin/'
     # success_url = reverse_lazy('home')
-
 
 # def add_news(request):
 #     if request.method == 'POST':
