@@ -3,6 +3,8 @@ from .models import *
 import re
 from PIL import Image
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
 
 
 class NewsForm(forms.ModelForm):
@@ -27,3 +29,25 @@ class NewsForm(forms.ModelForm):
         if re.match(r'\d', title):
             raise ValidationError('Название не должно начинаться с цифры')
         return title
+
+
+class UserRegisterForm(UserCreationForm):
+    username = forms.CharField(label='Имя пользователя',
+                               widget=forms.TextInput(attrs={'class': 'form-control mb-4'}))
+    password1 = forms.CharField(label='Пароль',
+                                widget=forms.PasswordInput(attrs={'class': 'form-control mb-4'}))
+    password2 = forms.CharField(label='Подтвердите пароль',
+                                widget=forms.PasswordInput(attrs={'class': 'form-control mb-4'}))
+    email = forms.EmailField(label='E-mail',
+                             widget=forms.EmailInput(attrs={'class': 'form-control mb-4'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+
+class UserLoginForm(AuthenticationForm):
+    username = forms.CharField(label='Имя пользователя',
+                               widget=forms.TextInput(attrs={'class': 'form-control mb-4'}))
+    password = forms.CharField(label='Пароль',
+                               widget=forms.PasswordInput(attrs={'class': 'form-control mb-4'}))

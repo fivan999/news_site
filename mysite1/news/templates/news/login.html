@@ -10,5 +10,12 @@
 
 {% block content %}
     <h1 class="mb-4">Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary btn-block">Вход</button>
+    </form>
 
 {% endblock %}

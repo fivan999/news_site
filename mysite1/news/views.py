@@ -1,32 +1,48 @@
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
 from news.models import News, Category
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
-from news.forms import NewsForm
+from news.forms import NewsForm, UserRegisterForm, UserLoginForm
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, logout
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.core.paginator import Paginator
 
 
+def user_logout(request):
+    logout(request)
+    return redirect('home')
+
+
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             messages.success(request, 'Регистрация успешна')
-            return redirect('login')
+            login(request, user)
+            return redirect('home')
         else:
             messages.error(request, 'Ошибка регистрации')
     else:
-        form = UserCreationForm()
+        form = UserRegisterForm()
     return render(request, 'news/register.html', {'form': form})
 
 
-def login(request):
-    return render(request, 'news/login.html')
+def user_login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, 'Успешный вход')
+            return redirect('home')
+    else:
+        form = UserLoginForm()
+    return render(request, 'news/login.html', {'form': form})
 
 
 class HomeNews(ListView):
@@ -34,10 +50,13 @@ class HomeNews(ListView):
     template_name = 'news/index.html'
     context_object_name = 'news'
     extra_context = {'title': 'Главная страница'}
-    allow_empty = False
+    allow_empty = True
     paginate_by = 2
 
     def get_queryset(self):
+        search_query = self.request.GET.get('search_req', None)
+        if search_query is not None:
+            return News.objects.exclude(is_published=0).filter(Q(title__icontains=search_query) | Q(content__icontains=search_query)).select_related('category')
         return News.objects.exclude(is_published=0).select_related('category')
 
 
@@ -93,7 +112,7 @@ class ViewNews(DetailView):
 class CreateNews(LoginRequiredMixin, CreateView):
     template_name = 'news/add_news.html'
     form_class = NewsForm
-    login_url = '/admin/'
+    login_url = '/login/'
     # success_url = reverse_lazy('home')
 
 # def add_news(request):
