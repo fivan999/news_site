@@ -142,3 +142,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ivan.filato2007@gmail.com'
+EMAIL_HOST_PASSWORD = 'izwjrcsexhtcsnke'
+EMAIL_PORT = 587

@@ -2,14 +2,36 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
 from news.models import News, Category
+from django.core.mail import send_mail
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
-from news.forms import NewsForm, UserRegisterForm, UserLoginForm
+from news.forms import NewsForm, UserRegisterForm, UserLoginForm, MailSendForm
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.core.paginator import Paginator
+
+
+def create_mailing(request):
+    if request.method == 'POST':
+        form = MailSendForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            text = form.cleaned_data['text']
+            receivers_list = form.cleaned_data['receivers'].split(' ')
+            result = send_mail(
+                subject, text, 'ivan.filato2007@gmail.com',
+                receivers_list, fail_silently=True
+            )
+            if result:
+                messages.success(request, 'Отправка успешна')
+                return redirect('send_mail')
+            else:
+                messages.error(request, 'Ошибка отправки')
+    else:
+        form = MailSendForm()
+    return render(request, 'news/send-mail.html', {'form': form})
 
 
 def user_logout(request):
