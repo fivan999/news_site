@@ -21,8 +21,8 @@
             <div class="card-body">
                 <div class="media">
                     <div class="media-body mb-2">
-                        <h5 class="card-title">{{ item.title }}</h5>
-                        <p class="card-text">{{ item.content }}</p>
+                        <h5 class="card-title">{{ item.title|safe }}</h5>
+                        <p class="card-text">{{ item.content|safe }}</p>
                         {% if item.image %}
                             <img src={{ item.image.url }} class="card-img-bottom" alt="..." style="max-width: 30%"><br>
                         {% endif %}
