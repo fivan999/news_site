@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.shortcuts import render
+import urllib
 from django.http import HttpResponse
 from news.models import News, Category
 from django.core.mail import send_mail
@@ -9,29 +10,80 @@ from news.forms import NewsForm, UserRegisterForm, UserLoginForm, MailSendForm
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.core.paginator import Paginator
+from django.conf import settings
+import json
 
 
-def create_mailing(request):
-    if request.method == 'POST':
-        form = MailSendForm(request.POST)
+def get_captcha_result(req):
+    recaptcha_response = req.POST.get('g-recaptcha-response')
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    values = {
+        'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+        'response': recaptcha_response
+    }
+    data = urllib.parse.urlencode(values).encode()
+    req = urllib.request.Request(url, data=data)
+    response = urllib.request.urlopen(req)
+    result = json.loads(response.read().decode())
+    return result
+
+
+# def create_mailing(request):
+#     if request.method == 'POST':
+#         form = MailSendForm(request.POST)
+#         if form.is_valid():
+#             result = get_captcha_result(request)
+#             if result['success']:
+#                 subject = form.cleaned_data['subject']
+#                 text = form.cleaned_data['text']
+#                 receivers_list = form.cleaned_data['receivers'].split(' ')
+#                 result = send_mail(
+#                     subject, text, 'ivan.filato2007@gmail.com',
+#                     receivers_list, fail_silently=True
+#                 )
+#                 if result:
+#                     messages.success(request, 'Отправка успешна')
+#                 else:
+#                     messages.error(request, 'Ошибка отправки')
+#                 return redirect('send_mail')
+#             else:
+#                 messages.error(request, 'Invalid reCAPTCHA')
+#                 return redirect('send_mail')
+#         else:
+#             messages.error(request, 'Форма заполнена неверно')
+#     else:
+#         form = MailSendForm()
+#     return render(request, 'news/send-mail.html', {'form': form})
+
+
+class MailView(FormView):
+    form_class = MailSendForm
+    template_name = 'news/send-mail.html'
+
+    def form_valid(self, form):
         if form.is_valid():
-            subject = form.cleaned_data['subject']
-            text = form.cleaned_data['text']
-            receivers_list = form.cleaned_data['receivers'].split(' ')
-            result = send_mail(
-                subject, text, 'ivan.filato2007@gmail.com',
-                receivers_list, fail_silently=True
-            )
-            if result:
-                messages.success(request, 'Отправка успешна')
+            result = get_captcha_result(self.request)
+            if result['success']:
+                subject = form.cleaned_data['subject']
+                text = form.cleaned_data['text']
+                receivers_list = form.cleaned_data['receivers'].split(' ')
+                result = send_mail(
+                    subject, text, 'ivan.filato2007@gmail.com',
+                    receivers_list, fail_silently=True
+                )
+                if result:
+                    messages.success(self.request, 'Отправка успешна')
+                else:
+                    messages.error(self.request, 'Ошибка отправки')
                 return redirect('send_mail')
             else:
-                messages.error(request, 'Ошибка отправки')
-    else:
-        form = MailSendForm()
-    return render(request, 'news/send-mail.html', {'form': form})
+                messages.error(self.request, 'Invalid reCAPTCHA')
+                return redirect('send_mail')
+        else:
+            messages.error(self.request, 'Форма заполнена неверно')
+            return redirect('send_mail')
 
 
 def user_logout(request):
@@ -39,32 +91,66 @@ def user_logout(request):
     return redirect('home')
 
 
-def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegisterForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             messages.success(request, 'Регистрация успешна')
+#             login(request, user)
+#             return redirect('home')
+#         else:
+#             messages.error(request, 'Ошибка регистрации')
+#     else:
+#         form = UserRegisterForm()
+#     return render(request, 'news/register.html', {'form': form})
+
+
+class RegisterView(FormView):
+    form_class = UserRegisterForm
+    template_name = 'news/register.html'
+
+    def form_valid(self, form):
         if form.is_valid():
-            user = form.save()
-            messages.success(request, 'Регистрация успешна')
-            login(request, user)
-            return redirect('home')
+            result = get_captcha_result(self.request)
+            if result['success']:
+                user = form.save()
+                messages.success(self.request, 'Регистрация успешна')
+                login(self.request, user)
+                return redirect('home')
+            else:
+                messages.error(self.request, 'Invalid reCAPTCHA')
+                return redirect('register')
         else:
-            messages.error(request, 'Ошибка регистрации')
-    else:
-        form = UserRegisterForm()
-    return render(request, 'news/register.html', {'form': form})
+            messages.error(self.request, 'Ошибка регистрации')
+            return redirect('register')
 
 
-def user_login(request):
-    if request.method == 'POST':
-        form = UserLoginForm(data=request.POST)
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = UserLoginForm(data=request.POST)
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+#             messages.success(request, 'Успешный вход')
+#             return redirect('home')
+#     else:
+#         form = UserLoginForm()
+#     return render(request, 'news/login.html', {'form': form})
+
+
+class LoginView(FormView):
+    form_class = UserLoginForm
+    template_name = 'news/login.html'
+
+    def form_valid(self, form):
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
-            messages.success(request, 'Успешный вход')
+            login(self.request, user)
+            messages.success(self.request, 'Успешный вход')
             return redirect('home')
-    else:
-        form = UserLoginForm()
-    return render(request, 'news/login.html', {'form': form})
+        else:
+            messages.error(self.request, 'Неверные данные')
 
 
 class HomeNews(ListView):

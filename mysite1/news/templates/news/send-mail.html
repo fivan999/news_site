@@ -14,8 +14,9 @@
         {% csrf_token %}
 
         {{ form.as_p }}
+        <div class="g-recaptcha" data-sitekey="6Lf7POshAAAAAIZIaTvJI2JfG4x8SGLkdJql4BI1"></div>
 
-        <button type="submit" class="btn btn-primary btn-block">Отправить</button>
+        <button type="submit" class="btn btn-primary btn-block mt-4">Отправить</button>
     </form>
 
 {% endblock %}

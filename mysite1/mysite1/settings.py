@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'ckeditor',
     'ckeditor_uploader',
+    'django.forms',
+    'snowpenguin.django.recaptcha3'
 ]
 
 MIDDLEWARE = [
@@ -145,13 +147,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'ivan.filato2007@gmail.com'
-EMAIL_HOST_PASSWORD = 'izwjrcsexhtcsnke'
-EMAIL_PORT = 587
-
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 CKEDITOR_CONFIGS = {
@@ -216,5 +211,21 @@ CKEDITOR_CONFIGS = {
             'dialogui',
             'elementspath'
         ]),
+    }
+}
+
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ivan.filato2007@gmail.com'
+EMAIL_HOST_PASSWORD = 'izwjrcsexhtcsnke'
+EMAIL_PORT = 587
+GOOGLE_RECAPTCHA_SECRET_KEY = '6Lf7POshAAAAAH9a8axHL5_A0cUztF4C72PlbR7x'
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'django_cache'),
     }
 }
